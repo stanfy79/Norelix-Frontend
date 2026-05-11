@@ -2,6 +2,7 @@ import React from 'react'
 import { usePrivy } from "@privy-io/react-auth";
 import UserObject from "../components/layout/user-object";
 import { FullScreenLoader } from '../components/ui/fullscreen-loader';
+import PayButton from '../components/layout/PlayButton';
 
 function Login() {
     const { ready, authenticated, logout, login } = usePrivy();
@@ -20,6 +21,7 @@ function Login() {
                         </button>
 
                         <div>
+                            <PayButton intentId="0xf53a769fb29d22d34574438bda5a370457ca7e0f87a4b9a3feeefa4262523383" amount="5" />
                         </div>
                     </div>
                     <UserObject />
