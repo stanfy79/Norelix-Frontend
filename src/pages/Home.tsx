@@ -13,15 +13,16 @@ import {
 import HeroImg from '../assets/hero-img.png'
 import Footer from '../components/common/Footer';
 import ScrollAnimation from '../components/ui/ScrollAnimation';
-import CodeWindow from '../components/ui/CodeWindow';
+import CodeWindow from '../components/ui/CodeCard';
+import CodeCard from '../components/ui/CodeCard';
 
 const Home = () => {
   return (
-    <main className="text-slate-100">
+    <main className="text-slate-100 bg-[#f1f5f9]">
       <Header />
 
       <section className="relative overflow-hidden py-16">
-        <div className="mx-auto mt-10 grid max-w-7xl gap-12 px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
+        <div className="mx-auto mt-10 grid gap-20 px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 border">
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 bg-emerald-500/30 px-4 py-2 text-[14px] text-black shadow-sm shadow-emerald-500/10 jetbrains-mono">
               <span className="inline-flex h-2.5 w-2.5  bg-emerald-400" />
@@ -68,19 +69,16 @@ const Home = () => {
             <img src={HeroImg} alt="Hero" className='w-[] md:w-[520px]' />
 
             <div className="absolute left-0 md:-left-10 -bottom-10
-            w-full md:w-72 bg-slate-950/95 jetbrains-mono p-6 hover:scale-105">
-              <div className="flex gap-3 text-sm text-[#10b981]">
-                <SquareTerminal />
-                <span className=''>NEKSU API SHELL</span>
-              </div>
-              <div className="bg-slate-900/90 py-4 text-sm text-slate-200">
-                <p className='text-wrap w-full text-slate-400 jetbrains-mono'>
-                  curl -X POST https://api.nexuspay.com/v1/charges \
-                  -H "Authorization: Bearer sk_live_..." \
-                  -d amount=5000 \
-                  -d currency=usdc
-                </p>
-              </div>
+            w-full md:w-72 hover:scale-105">
+<CodeCard
+  fileName="cURL EXAMPLE"
+  size='100%'
+  code={`curl -X POST https://api.nexuspay.com/v1/charges
+
+  -H "Authorization: Bearer sk_live_..."
+  -d amount=5000
+  -d currency=usdc`}
+/>
             </div>
           </div>
         </div>

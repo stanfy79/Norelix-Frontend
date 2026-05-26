@@ -3,7 +3,7 @@
 
 * {
   font-family: "Plus Jakarta Sans", sans-serif;
-  transition: all .5s ease-out;
+  transition: all .3s ease-out;
   box-sizing: border-box;
 }
 
@@ -12,8 +12,14 @@
   font-optical-sizing: auto;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .brutal {
   box-shadow: 4px 4px 0px #064e3b;
+  transition: all .3s ease-out;
+
   &:hover {
     transform: translate(6px, 6px);
     box-shadow: 0px 0px 0px #0d4a36;
@@ -27,11 +33,19 @@
   cursor: pointer;
   position: relative;
   background: #10b981;
-  transition: all .5s ease-out;
+  transition: all .3s ease-out;
   box-shadow: 4px 4px 0px #0d4a36;
 
   &:hover {
     transform: translate(6px, 6px);
     box-shadow: 0px 0px 0px #0d4a36;
   }
+}
+
+.circuit-bg {
+  background-color: #f6fafe;
+  background-image:
+    radial-gradient(#10b981 0.5px, transparent 0.5px),
+    linear-gradient(45deg, transparent 48%, rgba(16, 185, 129, 0.05) 50%, transparent 52%);
+  background-size: 32px 32px, 128px 128px;
 }
