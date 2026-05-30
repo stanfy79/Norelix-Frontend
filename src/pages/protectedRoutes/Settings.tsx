@@ -30,7 +30,7 @@ const Settings: React.FC = () => {
   const [profile, setProfile] = useState<Profile>({
     firstName: 'Alexander',
     lastName: 'Vance',
-    email: 'alexander@nexuspay.io',
+    email: 'alexander@Norelix.io',
   });
 
   const handleInputChange = (

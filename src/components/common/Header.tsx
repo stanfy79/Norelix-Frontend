@@ -16,7 +16,7 @@ function Header() {
                             N
                         </span>
                         <div>
-                            <p className="text-sm font-semibold tracking-[0.24em] uppercase text-slate-700">NeksuPay</p>
+                            <p className="text-sm font-semibold tracking-[0.24em] uppercase text-slate-700">Norelix</p>
                         </div>
                     </div>
                 </Link>
@@ -30,13 +30,15 @@ function Header() {
 
                 <div className="hidden md:flex items-center gap-3 absolute right-9 md">
                     <Link to='/signin'>
-                    <button className="px-4 py-2 text-[13px] text-black transition hover:font-bold hover:underline">
-                        Login
-                    </button>
+                        <button className="px-4 py-2 text-[13px] text-black transition hover:font-bold hover:underline">
+                            Login
+                        </button>
                     </Link>
-                    <button className="text-[13px] font-semibold text-slate-950  brutal-btn">
-                        Launch App
-                    </button>
+                    <Link to='/overview'>
+                        <button className="text-[13px] font-semibold text-slate-950  brutal-btn">
+                            Launch App
+                        </button>
+                    </Link>
                 </div>
             </header>
         </>

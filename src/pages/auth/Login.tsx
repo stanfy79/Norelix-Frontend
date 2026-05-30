@@ -10,7 +10,7 @@ const Login: React.FC = () => {
     const { ready, authenticated, login } = usePrivy();
 
     if (ready && authenticated) {
-        return <Navigate to="/settings" replace />
+        return <Navigate to="/overview" replace />
     };
 
     if (!ready) {
@@ -37,7 +37,7 @@ const Login: React.FC = () => {
                         </div>
 
                         <h1 className="text-[25px] font-extrabold text-[#171c1f] leading-tight tracking-tight mb-2 jetbrains-mono">
-                            Welcome to NexusPay
+                            Welcome to Norelix
                         </h1>
                         <p className="text-[#3c4a42] mb-8">
                             Access your cross-chain assets and technical dashboards.

@@ -49,3 +49,12 @@
     linear-gradient(45deg, transparent 48%, rgba(16, 185, 129, 0.05) 50%, transparent 52%);
   background-size: 32px 32px, 128px 128px;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  background: #8080804e;
+  height: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #064e3b;
+  border-radius: 30px;
+}
