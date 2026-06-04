@@ -4,8 +4,7 @@ import Sidebar from "../../components/common/Sidebar";
 import Footer from "../../components/common/Footer";
 import { PaymentHistory } from "../../components/common/PaymentHistory";
 import { usePrivy } from "@privy-io/react-auth";
-import { FullScreenLoader } from "../../components/ui/fullscreen-loader";
-import ConnectionError from "../../components/layout/ConnectionError";
+import ConnectionError from "../../components/ui/layout/ConnectionError";
 import { DataContext } from "../../context/Context";
 import { Skeleton } from "../../components/ui/skeleton";
 
@@ -45,7 +44,7 @@ const Dashboard: React.FC = () => {
       if (ready) {
         getBusinessAnalytics();
       }
-    }, [ready]);
+    }, [businessData]);
 
   const isBusinessLoading = Boolean(apiLoading?.business);
   const showBusinessData = Boolean(businessData?.businessId);
@@ -84,10 +83,6 @@ const Dashboard: React.FC = () => {
       year: "numeric",
     });
   };
-
-  if (!ready) {
-    return <FullScreenLoader />;
-  }
 
   return (
     <div className="flex flex-col overflow-hidden">
@@ -197,13 +192,13 @@ const Dashboard: React.FC = () => {
                       />
                     ))
                   ) : dailyTrend.length > 0 ? (
-                    dailyTrend.map((height: DailyTrend, index: number) => (
+                    dailyTrend.slice(0, 7).map((height: DailyTrend, index: number) => (
                       <div
                         className="w-full h-full relative group place-content-end"
                         key={index}
                       >
                         <div
-                          className={`pointer-events-none absolute bottom-8 z-30 w-56 border border-slate-200 bg-white p-4 text-slate-900 shadow-xl opacity-0 transition-all duration-200 group-hover:translate-y-[-4px] group-hover:opacity-100 ${
+                          className={`pointer-events-none absolute bottom-8 z-30 w-56 border border-slate-200 bg-white p-4 text-slate-900 shadow-xl opacity-0 transition-all duration-200 group-hover:translate-y-[-4px] group-hover:opacity-100 scale-75 ${
                             index === 0
                               ? "left-0"
                               : index === 6

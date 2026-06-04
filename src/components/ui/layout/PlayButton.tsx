@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { payWithWallet } from "../../blockchain/payment";
-import { showSuccessToast, showErrorToast } from "../ui/custom-toast";
+import { payWithWallet } from "../../../blockchain/payment";
+import { showSuccessToast, showErrorToast } from "../custom-toast";
 import axios from "axios";
 
 declare global {

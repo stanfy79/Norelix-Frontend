@@ -40,7 +40,7 @@ const Home = () => {
 
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
-                to="/checkout"
+                to="/overview"
                 className="inline-flex items-center justify-center bg-[#064e3b] px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-[#0a6c52] hover:text-white"
               >
                 Get Started

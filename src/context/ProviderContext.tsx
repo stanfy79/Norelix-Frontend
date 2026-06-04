@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { DataContext } from "./Context";
 import axios from "axios";
 import { usePrivy } from "@privy-io/react-auth";
+import { showSuccessToast } from "../components/ui/custom-toast";
+import { Navigate } from "react-router-dom";
 
 interface BusinessData {
   businessId: string;
@@ -12,11 +14,26 @@ interface BusinessData {
   apiKey: string;
 }
 
+interface BusinessSettingsUpdate {
+  businessName?: string;
+  businessTag?: string;
+  description?: string;
+  businessLogo?: string;
+  statementDescriptor?: string;
+  logoFile?: File | null;
+  accountSettings?: Record<string, unknown>;
+  notificationSettings?: Record<string, unknown>;
+  securitySettings?: Record<string, unknown>;
+  developerSettings?: Record<string, unknown>;
+}
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 function ProviderContext({ children }: { children: React.ReactNode }) {
   const { ready, user } = usePrivy();
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
+  const [settingsData, setSettingsData] =
+    useState<BusinessSettingsUpdate | null>(null);
   const [txHistory, setTxHistory] = useState<any[]>([]);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [businessLoading, setBusinessLoading] = useState<boolean>(true);
@@ -44,7 +61,6 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
     }
   };
 
-
   const getBusinessPayments = async () => {
     if (!ready || !user?.id) return;
 
@@ -64,8 +80,11 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         businessId: business?.data.data.businessId,
       };
 
-      const response = await axios.post(`${BASE_URL}/api/payment/txhistory`, payload);
-      
+      const response = await axios.post(
+        `${BASE_URL}/api/payment/txhistory`,
+        payload,
+      );
+
       setTxHistory(response.data.data || []);
     } catch (error) {
       console.error("Error fetching business tx history:", error);
@@ -80,16 +99,108 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
 
     setAnalyticsLoading(true);
     try {
-      const analysis = await axios.get(`${BASE_URL}/api/payment/analytics`, {headers: { "X-business-id": businessData.businessId }});
+      const analysis = await axios.get(`${BASE_URL}/api/payment/analytics`, {
+        headers: { "X-business-id": businessData.businessId },
+      });
 
       setAnalyticsData(analysis.data.data || []);
-    } catch(err) {
-        console.error("Error fetching business analytics data:", err);
-        setAnalyticsData(null);
+    } catch (err) {
+      console.error("Error fetching business analytics data:", err);
+      setAnalyticsData(null);
     } finally {
       setAnalyticsLoading(false);
     }
-  }
+  };
+
+  const updateBusinessSettings = async (updates: BusinessSettingsUpdate) => {
+    setSettingsData(updates);
+
+    setBusinessData((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        businessName: updates.businessName ?? prev.businessName,
+        businessTag: updates.businessTag ?? prev.businessTag,
+        description: updates.description ?? prev.description,
+        businessLogo: updates.businessLogo ?? prev.businessLogo,
+      };
+    });
+
+    const payload = {
+      id: user?.id ?? "",
+      businessName: updates.businessName ?? businessData?.businessName ?? "",
+      businessTag: updates.businessTag ?? businessData?.businessTag ?? "",
+      description: updates.description ?? businessData?.description ?? "",
+      businessLogo: updates.businessLogo ?? businessData?.businessLogo ?? "",
+    };
+
+    const requestBody = updates.logoFile
+      ? Object.entries(payload).reduce((formData, [key, value]) => {
+          if (key === "businessLogo") {
+            formData.append(key, updates.logoFile as File);
+            return formData;
+          }
+
+          formData.append(key, value);
+          return formData;
+        }, new FormData())
+      : payload;
+
+    const response = await axios.put(
+      `${BASE_URL}/api/merchant/update-business-info`,
+      requestBody,
+    );
+
+    console.log("Updating business settings with:", updates);
+    console.log("Updating business settings with:", response);
+    return {
+      ...updates,
+      businessId: businessData?.businessId,
+    };
+  };
+
+  const createNewSecretkey = async () => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/merchant/create-new-secret-key`,
+        { headers: { "X-unique-id": user?.id, "X-business-id": businessData?.businessId } },
+      );
+
+      if (!response?.data?.secretKey) {
+        console.error("Secret Key not found in response:");
+        return;
+      }
+      
+      showSuccessToast("New secret key generated successfully");
+
+      return response.data.secretKey;
+    } catch (error) {
+      console.error(
+        "Error fetching business details for secret key generation:",
+        error,
+      );
+      return;
+    }
+  };
+
+  const deleteBusiness = async () => {
+    if (!ready || !user?.id) return;
+
+    try {
+      await axios.delete(`${BASE_URL}/api/merchant/delete-business`, {
+        headers: {
+          "X-unique-id": user?.id,
+          "X-business-id": businessData?.businessId,
+        },
+      });
+      setBusinessData(null);
+      showSuccessToast("Business deleted successfully");
+      <Navigate to="/overview" replace />;
+    } catch (error) {
+      console.error("Error deleting business:", error);
+    }
+  };
 
   React.useEffect(() => {
     if (ready) {
@@ -97,14 +208,11 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
     }
   }, [ready, user?.id]);
 
-  if (!ready) {
-    return null;
-  }
-
   return (
     <DataContext.Provider
       value={{
         businessData,
+        settingsData,
         txHistory,
         analyticsData,
         apiLoading: {
@@ -114,6 +222,9 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         },
         getBusinessPayments,
         getBusinessAnalytics,
+        updateBusinessSettings,
+        createNewSecretkey,
+        deleteBusiness,
       }}
     >
       {children}

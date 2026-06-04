@@ -1,19 +1,37 @@
 import React from 'react'
 import { DataContext } from '../../context/Context'
 import { Copy, KeyIcon, TriangleAlert } from 'lucide-react'
-import { showSuccessToast } from "./custom-toast";
+import { showErrorToast, showSuccessToast } from "./custom-toast";
 import { Skeleton } from './skeleton';
 
 export const ApiComponent: React.FC = () => {
-  const { businessData, apiLoading } = React.useContext(DataContext) as {
+  const { businessData, apiLoading, createNewSecretkey } = React.useContext(DataContext) as {
     businessData: any;
     apiLoading?: {
       business: boolean;
       txHistory: boolean;
       analytics: boolean;
     };
+    createNewSecretkey: () => void | Promise<string>;
   }
   const isBusinessLoading = Boolean(apiLoading?.business);
+  const [secretKey, setSecretKey] = React.useState<string>("");
+  const [btnLoading, setBtnLoading] = React.useState(false);
+
+  const handleCreateNewSecretKey = async () => {
+    setBtnLoading(true);
+    try { 
+      const secretKeyResult = await createNewSecretkey();
+      if (secretKeyResult) {
+        setSecretKey(secretKeyResult);
+      }
+    } catch (error) {
+      console.error("Error generating new secret key:", error);
+    } finally {
+      setBtnLoading(false);
+    }
+  };
+
 
   return (
     <div className='bg-white space-y-7 p-4 w-full min-w-[250px] h-full'>
@@ -26,7 +44,8 @@ export const ApiComponent: React.FC = () => {
           disabled={!businessData?.businessId ?
             true :
             false
-          }>Generate New</button>
+          }
+          onClick={handleCreateNewSecretKey}>{btnLoading ? "Generating..." : "Generate New"}</button>
       </div>
 
       <div className="w-full flex flex-col gap-2">
@@ -67,9 +86,20 @@ export const ApiComponent: React.FC = () => {
             <div className="bg-slate-100 border-2 border-slate-200/50 p-2 flex justify-between items-center">
               <div className="text-[10px]">
                 <p className="text-slate-600">PRODUCTION SECRET KEY</p>
-                <p className="text-black">Secret_Key•••dvns</p>
+                {secretKey ?
+                <p className="text-black">{secretKey?.substring(0, 10)}•••{secretKey?.substring(secretKey.length - 6)}</p>
+                : <p className="text-black">••••••••••••••••</p>
+                }
               </div>
-              <div className="text-[#10b981] hover:bg-slate-300 bg-slate-200 p-2 rounded-[5px]">
+              <div className="text-[#10b981] hover:bg-slate-300 bg-slate-200 p-2 rounded-[5px]"
+              onClick={() => {
+                if (!secretKey) {
+                  showErrorToast("Please generate a new secret key first.");
+                } else {
+                  navigator.clipboard.writeText(secretKey);
+                  showSuccessToast("Secret key copied to clipboard!");
+                }
+              }}>
                 <Copy />
               </div>
             </div>

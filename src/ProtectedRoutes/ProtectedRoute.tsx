@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { usePrivy } from '@privy-io/react-auth';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { ready, authenticated } = usePrivy();
 
   if(!ready) {

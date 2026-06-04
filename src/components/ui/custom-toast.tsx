@@ -104,7 +104,7 @@ export function CustomToast({
 
 const toastOptions: ToastOptions = {
   position: "top-center",
-  autoClose: 5000,
+  autoClose: 2000,
   hideProgressBar: true,
   closeOnClick: false,
   pauseOnHover: true,

@@ -11,6 +11,7 @@ interface Transaction {
   orderId: string;
   status: "Confirmed" | "Pending" | "Failed";
   amount: string;
+  method?: string;
   time: string;
   date: string;
 }
@@ -100,6 +101,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
       const orderId = getStringValue(tx.orderId ?? tx.orderID ?? tx.order_id, "N/A");
       const amount = getStringValue(tx.amount ?? tx.amountPaid ?? tx.value, "0");
       const asset = getStringValue(tx.currency ?? tx.asset ?? tx.tokenSymbol, "USDC");
+      const method = getStringValue(tx.paymentMethod ?? tx.method ?? tx.channel, "N/A");
       const { date, time } = getDateParts(tx.createdAt ?? tx.updatedAt ?? tx.timestamp ?? tx.date);
       const formattedAmount = /[a-zA-Z]/.test(amount) ? amount : `${amount} ${asset}`;
 
@@ -111,6 +113,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
         amount: formattedAmount,
         date,
         time,
+        method,
       };
     });
   }, [txHistory]);
@@ -143,6 +146,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
       const matchesStatus =
         statusFilter === "All" || tx.status === statusFilter;
       const matchesStartDate = !startDate || tx.date >= startDate;
+      const matchesMethod = !tx.method || tx.method.toLowerCase().includes(query);
       const matchesEndDate = !endDate || tx.date <= endDate;
       const matchesMinAmount = min === null || amountValue >= min;
       const matchesMaxAmount = max === null || amountValue <= max;
@@ -153,6 +157,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
         matchesStartDate &&
         matchesEndDate &&
         matchesMinAmount &&
+        matchesMethod &&
         matchesMaxAmount
       );
     });
@@ -308,6 +313,9 @@ export const PaymentHistory = ({ historyCount }: History) => {
                     Status
                   </th>
                   <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                    Payment Method
+                  </th>
+                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Date
                   </th>
                   <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
@@ -354,6 +362,11 @@ export const PaymentHistory = ({ historyCount }: History) => {
                           }`}
                         >
                           {tx.status}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4">
+                        <span className="text-slate-500 text-[12px] font-medium tracking-tight jetbrains-mono">
+                          {tx.method ?? "N/A"}
                         </span>
                       </td>
                       <td className="px-8 py-4">
