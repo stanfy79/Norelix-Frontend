@@ -95,7 +95,7 @@ const Settings: React.FC = () => {
   const { ready, authenticated, logout, user } = usePrivy();
   const [activeTab, setActiveTab] = useState<string>("Settings");
 
-  const { businessData, apiLoading, getBusinessAnalytics, updateBusinessSettings, deleteBusiness, createNewSecretkey } = useContext(
+  const { businessData, apiLoading, getBusinessAnalytics, updateBusinessSettings, deleteBusiness } = useContext(
     DataContext,
   ) as {
     businessData: BusinessData | null;
@@ -278,8 +278,8 @@ const Settings: React.FC = () => {
 
 
   return (
-    <div className="flex flex-col overflow-hidden bg-[#b37850]">
-      <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-1 overflow-hidden bg-[#f1f5f9]">
         <ConfirmationModal
           reason={modalReason}
           isOpen={isModalOpen}
@@ -291,7 +291,7 @@ const Settings: React.FC = () => {
 
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        <main className="mt-16 md:mt-0 p-6 w-full space-y-12 jetbrains-mono overflow-y-auto h-screen no-scrollbar">
+        <main className="mt-16 md:mt-0 p-6 w-full space-y-12 jetbrains-mono overflow-y-auto h-screen pb-12 no-scrollbar">
           <div className="mb-8 flex flex-wrap-reverse items-center justify-between gap-4">
             <div>
               <h2 className="text-[22px] font-bold text-slate-900 md:text-2xl">

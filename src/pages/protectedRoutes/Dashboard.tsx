@@ -1,12 +1,15 @@
 import { ChartNoAxesCombined, CircleCheck, WalletCards } from "lucide-react";
+import { Link } from "react-router-dom";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import Sidebar from "../../components/common/Sidebar";
 import Footer from "../../components/common/Footer";
 import { PaymentHistory } from "../../components/common/PaymentHistory";
 import { usePrivy } from "@privy-io/react-auth";
 import ConnectionError from "../../components/ui/layout/ConnectionError";
+import TransactionModal from "../../components/ui/TransactionModal";
 import { DataContext } from "../../context/Context";
 import { Skeleton } from "../../components/ui/skeleton";
+import CreateBusiness from "../../components/ui/CreateBusiness";
 
 type TrendVolume = {
   raw: string;
@@ -26,36 +29,63 @@ const Dashboard: React.FC = () => {
   const { ready } = usePrivy();
   const [activeTab, setActiveTab] = useState<string>("Overview");
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isSendModalOpen, setIsSendModalOpen] = useState<boolean>(false);
 
-  const { businessData, analyticsData, apiLoading, getBusinessAnalytics, } = useContext(
-    DataContext,
-  ) as {
+  const {
+    businessData,
+    analyticsData,
+    walletBalances,
+    apiLoading,
+    getBusinessAnalytics,
+    handleSendTransactionEvm,
+  } = useContext(DataContext) as {
     businessData: any;
     analyticsData: any;
+    walletBalances: any;
     apiLoading?: {
       business: boolean;
       analytics: boolean;
       txHistory: boolean;
     };
     getBusinessAnalytics: () => void;
+    handleSendTransactionEvm: (address: string, value: number) => Promise<string | void>;
   };
 
   React.useEffect(() => {
-      if (ready) {
-        getBusinessAnalytics();
-      }
-    }, [businessData]);
+    if (ready) {
+      getBusinessAnalytics();
+    }
+  }, [businessData]);
+
+  useEffect(() => {
+    if (!ready) {
+      setIsOpen(true);
+    }
+  }, [ready]);
 
   const isBusinessLoading = Boolean(apiLoading?.business);
   const showBusinessData = Boolean(businessData?.businessId);
   const isAnalyticsLoading = Boolean(apiLoading?.analytics) || (showBusinessData && !analyticsData);
   const showDashboardSkeleton = isBusinessLoading || (showBusinessData && isAnalyticsLoading);
 
+
+  const availableUSDC = Number(
+    walletBalances?.find((bal: any) => bal.symbol === "USDC")?.balance ?? 0
+  );
+
+  const handleSendTx = async (address: string, amount: number) => {
+    try {
+      await handleSendTransactionEvm(address, amount);
+    } catch (err) {
+      console.log("Error", err);
+      throw err;
+    }
+  };
+
   const dailyTrend = useMemo<DailyTrend[]>(() => {
     if (!Array.isArray(analyticsData?.dailyTrend)) {
       return [];
     }
-
     return analyticsData.dailyTrend.slice(0, 7).toReversed();
   }, [analyticsData]);
 
@@ -63,12 +93,6 @@ const Dashboard: React.FC = () => {
     setIsOpen(false);
     window.location.reload();
   };
-
-  useEffect(() => {
-    if (!ready) {
-      setIsOpen(true);
-    }
-  }, [ready]);
 
   const formatTrendDate = (date: string) => {
     const parsedDate = new Date(date);
@@ -105,7 +129,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <div className="flex flex-col items-end">
                 <span className="font-mono text-slate-400 text-[10px] uppercase tracking-widest font-bold">
                   Current Network
@@ -149,7 +173,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             ) : businessData?.businessId ? (
-              <div className="col-span-12 lg:col-span-8 bg-white border border-slate-200 px-8 py-4 place-content-end relative overflow-hidden">
+              <div className="col-span-12 lg:col-span-8 bg-white border border-slate-200 px-8 py-4 place-content-end relative overflow-hidden circuit-bg">
                 <div className="absolute top-16 left-5 p-4 text-[#10b981] pointer-events-none opacity-10">
                   <ChartNoAxesCombined size={100} />
                 </div>
@@ -192,75 +216,79 @@ const Dashboard: React.FC = () => {
                       />
                     ))
                   ) : dailyTrend.length > 0 ? (
-                    dailyTrend.slice(0, 7).map((height: DailyTrend, index: number) => (
-                      <div
-                        className="w-full h-full relative group place-content-end"
-                        key={index}
-                      >
+                    dailyTrend
+                      .slice(0, 7)
+                      .map((height: DailyTrend, index: number) => (
                         <div
-                          className={`pointer-events-none absolute bottom-8 z-30 w-56 border border-slate-200 bg-white p-4 text-slate-900 shadow-xl opacity-0 transition-all duration-200 group-hover:translate-y-[-4px] group-hover:opacity-100 scale-75 ${
-                            index === 0
-                              ? "left-0"
-                              : index === 6
-                                ? "right-0"
-                                : "left-1/2 -translate-x-1/2"
-                          }`}
+                          className="w-full h-full relative group place-content-end"
+                          key={index}
                         >
-                          <div className="mb-3 border-b border-slate-100 pb-2">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                              Payment Activity
-                            </p>
-                            <p className="mt-1 text-[12px] font-bold text-slate-900">
-                              {formatTrendDate(height.date)}
-                            </p>
+                          <div
+                            className={`pointer-events-none absolute bottom-8 z-30 w-56 border border-slate-200 bg-white p-4 text-slate-900 shadow-xl opacity-0 transition-all duration-200 group-hover:translate-y-[-4px] group-hover:opacity-100 scale-75 ${
+                              index === 0
+                                ? "left-0"
+                                : index === 6
+                                  ? "right-0"
+                                  : "left-1/2 -translate-x-1/2"
+                            }`}
+                          >
+                            <div className="mb-3 border-b border-slate-100 pb-2">
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Payment Activity
+                              </p>
+                              <p className="mt-1 text-[12px] font-bold text-slate-900">
+                                {formatTrendDate(height.date)}
+                              </p>
+                            </div>
+
+                            <div className="text-[11px]">
+                              <div className="flex items-center justify-between gap-4">
+                                <span className="text-slate-500">Total</span>
+                                <span className="font-bold text-slate-900">
+                                  {height.totalPayments}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-4">
+                                <span className="text-slate-500">
+                                  Successful
+                                </span>
+                                <span className="font-bold text-emerald-600">
+                                  {height.successfulPayments}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-4">
+                                <span className="text-slate-500">Failed</span>
+                                <span className="font-bold text-red-600">
+                                  {height.failedPayments}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-2">
+                                <span className="text-slate-500">Volume</span>
+                                <span className="font-bold text-slate-900">
+                                  ${height.volume?.display ?? "0.00"}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-4">
+                                <span className="text-slate-500">Settled</span>
+                                <span className="font-bold text-slate-900">
+                                  ${height.successfulVolume?.display ?? "0.00"}
+                                </span>
+                              </div>
+                            </div>
                           </div>
 
-                          <div className="text-[11px]">
-                            <div className="flex items-center justify-between gap-4">
-                              <span className="text-slate-500">Total</span>
-                              <span className="font-bold text-slate-900">
-                                {height.totalPayments}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4">
-                              <span className="text-slate-500">Successful</span>
-                              <span className="font-bold text-emerald-600">
-                                {height.successfulPayments}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4">
-                              <span className="text-slate-500">Failed</span>
-                              <span className="font-bold text-red-600">
-                                {height.failedPayments}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-2">
-                              <span className="text-slate-500">Volume</span>
-                              <span className="font-bold text-slate-900">
-                                ${height.volume?.display ?? "0.00"}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4">
-                              <span className="text-slate-500">Settled</span>
-                              <span className="font-bold text-slate-900">
-                                ${height.successfulVolume?.display ?? "0.00"}
-                              </span>
-                            </div>
+                          <div
+                            style={{ height: `${height.totalPayments}%` }}
+                            className={`relative border-t-2 transition-all duration-300 ${
+                              index === 6
+                                ? "bg-emerald-500/20 border-emerald-500"
+                                : "bg-emerald-100/50 border-emerald-500"
+                            }`}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                           </div>
                         </div>
-
-                        <div
-                          style={{ height: `${height.totalPayments}%` }}
-                          className={`relative border-t-2 transition-all duration-300 ${
-                            index === 6
-                              ? "bg-emerald-500/20 border-emerald-500"
-                              : "bg-emerald-100/50 border-emerald-500"
-                          }`}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                        </div>
-                      </div>
-                    ))
+                      ))
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[12px] font-bold uppercase text-slate-400">
                       No analytics data
@@ -269,11 +297,8 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="col-span-12 lg:col-span-8 bg-white border h-90 border-slate-200 p-8 relative overflow-hidden items-center justify-center flex-col flex">
-                <p className="text-[16px] text-slate-500">No Payment Data</p>
-                <button className="brutal text-[14px] bg-[#10b981] jetbrains-mono p-3 mt-4">
-                  Create New Business
-                </button>
+              <div className="col-span-12 lg:col-span-8">
+                <CreateBusiness />
               </div>
             )}
 
@@ -294,19 +319,23 @@ const Dashboard: React.FC = () => {
                   <>
                     <div className="flex justify-between items-center">
                       <span className="text-[12px] font-extrabold text-slate-500 uppercase font-mono tracking-wider">
-                        Settled Balance
+                        Wallet Balance
                       </span>
                       <span className="material-symbols-outlined text-[#10b981]">
                         <WalletCards />
                       </span>
                     </div>
                     <div>
-                      <h4 className="text-[24px] font-bold text-black tracking-tight jetbrains-mono">
+                      <h4 className="text-[24px] font-extrabold text-black tracking-tight jetbrains-mono">
                         $
-                        {analyticsData?.summary?.successfulVolume?.display ??
+                        {walletBalances.filter((bal: any) => bal.symbol === "USDC").map((bal: any) => bal.balance + " USDC") ??
                           "0.00"}
                       </h4>
-                      <button className="mt-2 font-mono text-[10px] text-slate-400 hover:text-slate-700 hover:underline uppercase font-bold tracking-tight transition-colors">
+                      <button
+                        type="button"
+                        onClick={() => setIsSendModalOpen(true)}
+                        className="mt-3 rounded-sm bg-emerald-500 px-3 py-2 text-[10px] font-bold uppercase tracking-tight text-white transition hover:bg-emerald-600"
+                      >
                         Initiate Withdrawal →
                       </button>
                     </div>
@@ -534,15 +563,23 @@ const Dashboard: React.FC = () => {
             <PaymentHistory historyCount={10} />
 
             <div className="px-8 py-4 border-t border-slate-200 bg-slate-50 flex justify-center">
-              <button className="jetbrains-mono text-[12px] font-bold text-[#10b981] hover:text-emerald-700 hover:underline uppercase tracking-tight transition-colors">
-                View Full Audit Log →
-              </button>
+              <Link to="/payments">
+                <button className="jetbrains-mono text-[12px] font-bold text-[#10b981] hover:text-emerald-700 hover:underline uppercase tracking-tight transition-colors">
+                  View Full Payment Log →
+                </button>
+              </Link>
             </div>
           </section>
 
           <Footer />
         </main>
       </div>
+      <TransactionModal
+        isOpen={isSendModalOpen}
+        onClose={() => setIsSendModalOpen(false)}
+        onSend={handleSendTx}
+        usdcBalance={availableUSDC}
+      />
     </div>
   );
 };

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Header from '../../components/common/Header';
 import { usePrivy } from '@privy-io/react-auth';
 import { FullScreenLoader } from '../../components/ui/fullscreen-loader';
-import { LogOut } from 'lucide-react';
 
 const Login: React.FC = () => {
 

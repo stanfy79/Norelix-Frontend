@@ -5,9 +5,6 @@ import Dashboard from '../pages/protectedRoutes/Dashboard';
 import Payments from '../pages/protectedRoutes/Payments';
 import Webhooks from '../pages/Webhooks';
 import Settings from '../pages/protectedRoutes/Settings';
-import Checkout from '../pages/Checkout';
-import Success from '../pages/Success';
-import Failed from '../pages/Failed';
 import NotFound from '../pages/NotFound';
 import Login from '../pages/auth/Login';
 import WidgetSDK from '../pages/protectedRoutes/WidgetSDK';
@@ -50,18 +47,6 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <Settings />
       </ProtectedRoute>
-  },
-  {
-    path: '/checkout',
-    element: <Checkout />,
-  },
-  {
-    path: '/success',
-    element: <Success />,
-  },
-  {
-    path: '/failed',
-    element: <Failed />,
   },
   {
     path: '*',

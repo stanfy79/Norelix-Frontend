@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { DataContext } from "./Context";
 import axios from "axios";
-import { usePrivy } from "@privy-io/react-auth";
-import { showSuccessToast } from "../components/ui/custom-toast";
+import {
+  usePrivy,
+  useSendTransaction as useSendTransactionEvm,
+} from "@privy-io/react-auth";
+import {
+  showErrorToast,
+  showSuccessToast,
+} from "../components/ui/custom-toast";
 import { Navigate } from "react-router-dom";
+import { useSendTx } from "../components/ui/SendTransactionEvm";
 
 interface BusinessData {
   businessId: string;
@@ -12,6 +19,13 @@ interface BusinessData {
   businessTag: string;
   description: string;
   apiKey: string;
+}
+
+interface CreateBusiness {
+  businessName: string;
+  description: string;
+  businessLogo: string;
+  tags: string;
 }
 
 interface BusinessSettingsUpdate {
@@ -28,17 +42,44 @@ interface BusinessSettingsUpdate {
 }
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+const USDC_ARBITRUM_SEPOLIA = import.meta.env.VITE_USDC_ADDRESS;
 
 function ProviderContext({ children }: { children: React.ReactNode }) {
-  const { ready, user } = usePrivy();
+  const { ready, user, authenticated } = usePrivy();
+  const { sendTransaction: sendTransactionEvm } = useSendTransactionEvm();
+
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
   const [settingsData, setSettingsData] =
     useState<BusinessSettingsUpdate | null>(null);
   const [txHistory, setTxHistory] = useState<any[]>([]);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [walletBalances, setWalletBalances] = useState<any[]>([]);
+
   const [businessLoading, setBusinessLoading] = useState<boolean>(true);
   const [txHistoryLoading, setTxHistoryLoading] = useState<boolean>(false);
   const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(false);
+
+  const createBusiness = async (payload: CreateBusiness) => {
+    if (!ready || !user?.id) return;
+
+    try {
+      const fullPayload = {
+        ...payload,
+        ownerId: user.id,
+        ownerWallet: user?.wallet?.address,
+      };
+      const response = await axios.post(
+        `${BASE_URL}/api/merchant/create-business`,
+        fullPayload,
+      );
+
+      setBusinessData(response.data.data || null);
+      return response;
+    } catch (err) {
+      console.error("Error creating business:", err);
+      throw err;
+    }
+  };
 
   const getMerchantBusiness = async () => {
     if (!ready || !user?.id) {
@@ -164,14 +205,19 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
     try {
       const response = await axios.get(
         `${BASE_URL}/api/merchant/create-new-secret-key`,
-        { headers: { "X-unique-id": user?.id, "X-business-id": businessData?.businessId } },
+        {
+          headers: {
+            "X-unique-id": user?.id,
+            "X-business-id": businessData?.businessId,
+          },
+        },
       );
 
       if (!response?.data?.secretKey) {
         console.error("Secret Key not found in response:");
         return;
       }
-      
+
       showSuccessToast("New secret key generated successfully");
 
       return response.data.secretKey;
@@ -181,6 +227,28 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         error,
       );
       return;
+    }
+  };
+
+  const getWalletBalance = async () => {
+    try {
+      const wallet = ((user?.linkedAccounts || []).find(
+        (account: any) => account?.type === "wallet"
+      ) as any)?.address;
+
+      if (!wallet) {
+        console.warn("No wallet address found");
+        return null;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/api/merchant/get-balances/${wallet.toLowerCase()}`,
+      );
+
+      setWalletBalances(response.data.data || []);
+    } catch (err) {
+      console.error("Error fetching wallet balances:", err);
+      return null;
     }
   };
 
@@ -202,9 +270,45 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
     }
   };
 
+
+  const sendToken = useSendTx({
+    sendTransactionEvm,
+    user,
+    ready,
+    authenticated,
+  });
+
+  const handleSendTransactionEvm = async (to: string, amount: number) => {
+    if (!to) {
+      showErrorToast("Please enter a wallet address");
+      return;
+    }
+
+    try {
+      const txHash = await sendToken(
+        to,
+        amount,
+        {
+          type: "erc20",
+          contractAddress: USDC_ARBITRUM_SEPOLIA as any,
+          decimals: 6,
+        },
+        421614,
+      );
+
+      showSuccessToast("USDC transfer submitted. Check your wallet for confirmation.");
+      return txHash;
+    } catch (err) {
+      showErrorToast("Failed to send transaction!");
+      console.log("Error", err);
+      throw err;
+    }
+  };
+
   React.useEffect(() => {
     if (ready) {
       getMerchantBusiness();
+      getWalletBalance();
     }
   }, [ready, user?.id]);
 
@@ -215,6 +319,7 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         settingsData,
         txHistory,
         analyticsData,
+        walletBalances,
         apiLoading: {
           business: businessLoading,
           txHistory: txHistoryLoading,
@@ -225,6 +330,8 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         updateBusinessSettings,
         createNewSecretkey,
         deleteBusiness,
+        createBusiness,
+        handleSendTransactionEvm,
       }}
     >
       {children}

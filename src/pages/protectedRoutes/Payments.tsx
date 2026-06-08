@@ -8,6 +8,7 @@ import { CircleUser } from "lucide-react";
 import { showSuccessToast } from "../../components/ui/custom-toast";
 import { Skeleton } from "../../components/ui/skeleton";
 import { DataContext } from "../../context/Context";
+import Footer from "../../components/common/Footer";
 
 const Payments: React.FC = () => {
   const { analyticsData, apiLoading, businessData, getBusinessAnalytics } =
@@ -148,6 +149,8 @@ const Payments: React.FC = () => {
               </button>
             </div>
           </section>
+
+          <Footer />
         </main>
       </div>
     </div>

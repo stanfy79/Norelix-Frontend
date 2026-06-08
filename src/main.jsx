@@ -18,6 +18,7 @@ createRoot(document.getElementById('root')).render(
             createOnLogin: 'users-without-wallets'
           }
         },
+        disableAnalytics: true,
         appearance: { walletChainType: "ethereum-and-solana" },
       }}
     >
