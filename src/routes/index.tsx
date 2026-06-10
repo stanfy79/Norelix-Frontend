@@ -11,6 +11,7 @@ import WidgetSDK from '../pages/protectedRoutes/WidgetSDK';
 import ProtectedRoute from '../ProtectedRoutes/ProtectedRoute';
 
 export const router = createBrowserRouter([
+  
   {
     path: '/',
     element: <Home />,
