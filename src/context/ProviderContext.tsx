@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { DataContext } from "./Context";
 import axios from "axios";
 import {
   usePrivy,
   useSendTransaction as useSendTransactionEvm,
+  useWallets,
 } from "@privy-io/react-auth";
 import {
   showErrorToast,
@@ -41,11 +42,33 @@ interface BusinessSettingsUpdate {
   developerSettings?: Record<string, unknown>;
 }
 
+type WalletInfo = {
+  address: string;
+  type: "ethereum" | "solana";
+  name: string;
+  isPrivy?: boolean;
+};
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const USDC_ARBITRUM_SEPOLIA = import.meta.env.VITE_USDC_ADDRESS;
 
+
 function ProviderContext({ children }: { children: React.ReactNode }) {
-  const { ready, user, authenticated } = usePrivy();
+  const { wallets: walletsEvm } = useWallets();
+  const allWallets = useMemo((): WalletInfo[] => {
+    const evmWallets: WalletInfo[] = walletsEvm
+      .filter((wallet) => wallet.walletClientType === "privy")
+      .map((wallet) => ({
+        address: wallet.address,
+        type: "ethereum" as const,
+        name: wallet.address,
+        isPrivy: wallet.walletClientType === "privy",
+      }));
+
+    return [...evmWallets];
+  }, [walletsEvm]);
+
+  const { ready, user, authenticated, exportWallet: exportWalletEvm } = usePrivy();
   const { sendTransaction: sendTransactionEvm } = useSendTransactionEvm();
 
   const [businessData, setBusinessData] = useState<BusinessData | null>(null);
@@ -299,11 +322,26 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
       showSuccessToast("USDC transfer submitted. Check your wallet for confirmation.");
       return txHash;
     } catch (err) {
-      showErrorToast("Failed to send transaction!");
+      const message = err?.toString?.() ?? "Failed to send transaction!";
+      showErrorToast(message);
       console.log("Error", err);
       throw err;
     }
   };
+
+
+  const exportWallet = async (wallet: any) => {
+    try {
+      if (!wallet) throw new Error("Missing recipient");
+
+        await exportWalletEvm({ address: wallet.address });
+        showSuccessToast("Ethereum wallet exported");
+    } catch (error) {
+      const message = error?.toString?.() ?? "Failed to export wallet";
+      showErrorToast(message);
+    }
+  }
+
 
   React.useEffect(() => {
     if (ready) {
@@ -311,6 +349,7 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
       getWalletBalance();
     }
   }, [ready, user?.id]);
+
 
   return (
     <DataContext.Provider
@@ -320,6 +359,7 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         txHistory,
         analyticsData,
         walletBalances,
+        allWallets,
         apiLoading: {
           business: businessLoading,
           txHistory: txHistoryLoading,
@@ -332,6 +372,7 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
         deleteBusiness,
         createBusiness,
         handleSendTransactionEvm,
+        exportWallet,
       }}
     >
       {children}

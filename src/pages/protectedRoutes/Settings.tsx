@@ -70,6 +70,13 @@ type DeveloperSettings = {
   webhookRetries: string;
 };
 
+type WalletInfo = {
+  address: string;
+  type: "ethereum" | "solana";
+  name: string;
+  isPrivy?: boolean;
+};
+
 const getUserEmail = (user: unknown) => {
   const privyUser = user as {
     email?: { address?: string };
@@ -95,13 +102,21 @@ const Settings: React.FC = () => {
   const { ready, authenticated, logout, user } = usePrivy();
   const [activeTab, setActiveTab] = useState<string>("Settings");
 
-  const { businessData, apiLoading, getBusinessAnalytics, updateBusinessSettings, deleteBusiness } = useContext(
-    DataContext,
-  ) as {
+  const {
+    businessData,
+    apiLoading,
+    allWallets,
+    getBusinessAnalytics,
+    updateBusinessSettings,
+    deleteBusiness,
+    exportWallet,
+  } = useContext(DataContext) as {
     businessData: BusinessData | null;
     getBusinessAnalytics: () => void;
     deleteBusiness: () => void;
     createNewSecretkey: () => void;
+    exportWallet: (wallet: string) => Promise<any>;
+    allWallets: any;
     apiLoading?: {
       business: boolean;
       analytics: boolean;
@@ -126,9 +141,10 @@ const Settings: React.FC = () => {
       getBusinessAnalytics();
     }
   }, [businessData]);
+  
 
   const userEmail = useMemo(() => getUserEmail(user), [user]);
-  const walletAddress = user?.wallet?.address;
+  const [selectedWallet, setSelectedWallet] = useState<WalletInfo | any>(null);
   const isBusinessLoading = Boolean(apiLoading?.business);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalReason, setModalReason] = useState<"logout" | "delete">("logout");
@@ -174,6 +190,13 @@ const Settings: React.FC = () => {
   );
 
   React.useEffect(() => {
+    if (allWallets.length > 0 && !selectedWallet) {
+      setSelectedWallet(allWallets[0]);
+    }
+  }, [allWallets, selectedWallet]);
+
+
+  React.useEffect(() => {
     if (userEmail) {
       setAccountSettings((prev) => ({
         ...prev,
@@ -181,6 +204,7 @@ const Settings: React.FC = () => {
       }));
     }
   }, [userEmail]);
+  
 
   React.useEffect(() => {
     if (businessData?.businessId) {
@@ -275,7 +299,6 @@ const Settings: React.FC = () => {
     setIsModalOpen(false);
     deleteBusiness();
   };
-
 
   return (
     <div className="flex flex-col overflow-hidden">
@@ -660,6 +683,98 @@ const Settings: React.FC = () => {
                   Danger Zone
                 </h1>
 
+                <div className="space-y-6 p-5 bg-white">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#064e3b] text-white">
+                      <Upload size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-[12px] font-bold text-[#064e3b]">
+                        Export Wallet
+                      </h3>
+                      <p className="mt-1 text-[12px] leading-5 text-[#064e3b]">
+                        Export your wallet address to another wallet.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="wallet-management-select"
+                      className="block text-sm font-medium mb-2"
+                    >
+                      Select wallet to export:
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="wallet-management-select"
+                        value={selectedWallet?.address || ""}
+                        onChange={(e) => {
+                          const wallet = allWallets.find(
+                            (w: any) => w.address === e.target.value,
+                          );
+                          setSelectedWallet(wallet || null);
+                        }}
+                        className="w-full text-[12px] jetbrains-mono pl-3 pr-8 py-2 border border-[#E2E3F0] rounded-md bg-white text-black focus:outline-none focus:ring-1 focus:ring-black appearance-none"
+                      >
+                        {allWallets.length === 0 ? (
+                          <option value="">No wallets available</option>
+                        ) : (
+                          <>
+                            <option value="">Select a wallet</option>
+                            {allWallets.map((wallet: any) => (
+                              <option
+                                key={wallet.address}
+                                value={wallet.address}
+                              >
+                                {wallet.address} [
+                                {wallet.type === "ethereum"
+                                  ? "ethereum"
+                                  : "solana"}
+                                ]
+                              </option>
+                            ))}
+                          </>
+                        )}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg
+                          className="w-4 h-4 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {authenticated ? (
+                    <button
+                      type="button"
+                      onClick={() => exportWallet(selectedWallet)}
+                      className="mt-5 inline-flex items-center justify-center gap-2 rounded-sm bg-slate-100 border border-slate-200 px-4 py-2.5 text-[12px] font-bold text-black transition hover:bg-slate-300"
+                    >
+                      <Upload size={16} />
+                      Export Wallet
+                    </button>
+                  ) : (
+                    <div className="mt-5 border border-red-200 bg-white px-4 py-3 text-[12px] font-bold text-red-700">
+                      <Link to="/signin">
+                        <button className="px-4 py-2 text-[13px] text-black transition hover:font-bold hover:underline">
+                          You need to login.
+                        </button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-6">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-red-100 text-red-700">
@@ -686,7 +801,11 @@ const Settings: React.FC = () => {
                     </button>
                   ) : (
                     <div className="mt-5 border border-red-200 bg-white px-4 py-3 text-[12px] font-bold text-red-700">
-                      You need to login.
+                      <Link to="/signin">
+                        <button className="px-4 py-2 text-[13px] text-black transition hover:font-bold hover:underline">
+                          You need to login.
+                        </button>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -719,7 +838,7 @@ const Settings: React.FC = () => {
                     <div className="mt-5 border border-red-200 bg-white px-4 py-3 text-[12px] font-bold text-red-700">
                       <Link to="/signin">
                         <button className="px-4 py-2 text-[13px] text-black transition hover:font-bold hover:underline">
-                          Login
+                          You need to login.
                         </button>
                       </Link>
                     </div>
@@ -761,7 +880,7 @@ const Settings: React.FC = () => {
                   Connected Wallet
                 </p>
                 <p className="mt-1 break-all text-[11px] text-slate-500">
-                  {shortenValue(walletAddress, 10)}
+                  {/* {shortenValue(walletAddress, 10)} */}
                 </p>
               </div>
             </div>
