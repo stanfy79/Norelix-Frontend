@@ -160,7 +160,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
         matchesMethod &&
         matchesMaxAmount
       );
-    });
+    }).toReversed();
   }, [
     transactions,
     searchQuery,
@@ -173,7 +173,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
 
   return (
     <>
-      <div className="px-8 py-6 border-b border-slate-200">
+      <div className="px-2 py-6 border-b border-slate-200">
         <div className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center">
           <h3 className="text-[18px] font-bold text-slate-900 tracking-tight">
             Recent Transactions
@@ -300,28 +300,28 @@ export const PaymentHistory = ({ historyCount }: History) => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-5 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Transaction Hash
                   </th>
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-2 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Amount / Asset
                   </th>
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-2 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Order id
                   </th>
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-2 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Status
                   </th>
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-2 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Payment Method
                   </th>
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-2 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Date
                   </th>
-                  <th className="px-8 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  <th className="px-2 py-4 font-mono text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                     Time
                   </th>
-                  <th className="px-8 py-4 text-right"></th>
+                  <th className="px-2 py-4 text-right"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -333,25 +333,25 @@ export const PaymentHistory = ({ historyCount }: History) => {
                       key={tx.id}
                       className="group hover:bg-slate-50/80 transition-colors"
                     >
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full bg-emerald-500 invisible group-hover:visible transition-all"></div>
                           <span className="text-slate-900 text-[12px] font-medium tracking-tight jetbrains-mono">
-                            {tx.hash}
+                            {tx.hash.substring(0, 7)}...{tx.hash.substring(tx.hash.length - 7)}
                           </span>
                         </div>
                       </td>
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <span className="text-slate-900 text-[12px] font-medium tracking-tight jetbrains-mono">
                           {tx.amount}
                         </span>
                       </td>
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <span className="text-slate-900 text-[12px] font-medium tracking-tight jetbrains-mono">
                           {tx.orderId}
                         </span>
                       </td>
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <span
                           className={`px-2 py-0.5 text-[10px] font-bold uppercase jetbrains-mono rounded-sm ${
                             tx.status === "Confirmed"
@@ -364,22 +364,22 @@ export const PaymentHistory = ({ historyCount }: History) => {
                           {tx.status}
                         </span>
                       </td>
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <span className="text-slate-500 text-[12px] font-medium tracking-tight jetbrains-mono">
                           {tx.method ?? "N/A"}
                         </span>
                       </td>
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <span className="text-slate-500 text-[12px] font-medium tracking-tight jetbrains-mono">
                           {tx.date}
                         </span>
                       </td>
-                      <td className="px-8 py-4">
+                      <td className="px-2 py-4">
                         <span className="text-slate-400 text-[12px] font-medium tracking-tight jetbrains-mono">
                           {tx.time}
                         </span>
                       </td>
-                      <td className="px-8 py-4 text-right">
+                      <td className="px-5 py-4 text-right">
                         <button className="text-slate-400 hover:text-emerald-500 transition-colors">
                           <span className="material-symbols-outlined text-xl">
                             <Link
@@ -397,7 +397,7 @@ export const PaymentHistory = ({ historyCount }: History) => {
                   <tr>
                     <td
                       colSpan={7}
-                      className="px-8 py-10 text-center text-sm font-mono text-slate-400 uppercase"
+                      className="px-2 py-10 text-center text-sm font-mono text-slate-400 uppercase"
                     >
                       No transactions found match query parameters
                     </td>
