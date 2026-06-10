@@ -1,16 +1,14 @@
 // src/routes/index.tsx
 import { createBrowserRouter } from 'react-router-dom';
 import Home from '../pages/Home';
-import Dashboard from '../pages/Dashboard';
-import Payments from '../pages/Payments';
-import ApiKeys from '../pages/ApiKeys';
+import Dashboard from '../pages/protectedRoutes/Dashboard';
+import Payments from '../pages/protectedRoutes/Payments';
 import Webhooks from '../pages/Webhooks';
-import Settings from '../pages/Settings';
-import Checkout from '../pages/Checkout';
-import Success from '../pages/Success';
-import Failed from '../pages/Failed';
+import Settings from '../pages/protectedRoutes/Settings';
 import NotFound from '../pages/NotFound';
-import Login from '../auth/Login';
+import Login from '../pages/auth/Login';
+import WidgetSDK from '../pages/protectedRoutes/WidgetSDK';
+import ProtectedRoute from '../ProtectedRoutes/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -23,15 +21,21 @@ export const router = createBrowserRouter([
   },
   {
     path: '/overview',
-    element: <Dashboard />,
+    element:
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>,
   },
   {
     path: '/payments',
     element: <Payments />,
   },
   {
-    path: '/api-keys',
-    element: <ApiKeys />,
+    path: '/widget-sdk',
+    element: 
+    <ProtectedRoute>
+      <WidgetSDK />
+    </ProtectedRoute>,
   },
   {
     path: '/webhooks',
@@ -39,19 +43,10 @@ export const router = createBrowserRouter([
   },
   {
     path: '/settings',
-    element: <Settings />,
-  },
-  {
-    path: '/checkout',
-    element: <Checkout />,
-  },
-  {
-    path: '/success',
-    element: <Success />,
-  },
-  {
-    path: '/failed',
-    element: <Failed />,
+    element:
+      <ProtectedRoute>
+        <Settings />
+      </ProtectedRoute>
   },
   {
     path: '*',

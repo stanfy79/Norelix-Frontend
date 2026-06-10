@@ -13,23 +13,24 @@ import {
 import HeroImg from '../assets/hero-img.png'
 import Footer from '../components/common/Footer';
 import ScrollAnimation from '../components/ui/ScrollAnimation';
-import CodeWindow from '../components/ui/CodeWindow';
+import CodeWindow from '../components/ui/CodeCard';
+import CodeCard from '../components/ui/CodeCard';
 
 const Home = () => {
   return (
-    <main className="text-slate-100">
+    <main className="text-slate-100 bg-[#f1f5f9]">
       <Header />
 
       <section className="relative overflow-hidden py-16">
-        <div className="mx-auto mt-10 grid max-w-7xl gap-12 px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
+        <div className="mx-auto mt-10 grid gap-20 px-4 lg:grid-cols-[1.1fr_0.9fr] sm:px-8 border">
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 bg-emerald-500/30 px-4 py-2 text-[14px] text-black shadow-sm shadow-emerald-500/10 jetbrains-mono">
               <span className="inline-flex h-2.5 w-2.5  bg-emerald-400" />
-              V2.0 Now Live
+              V1.0 Now Live
             </div>
 
             <div className="space-y-6">
-              <h1 className="max-w-3xl text-4xl jetbrains-mono leading-[60px] text-slate-800 md:text-5xl">
+              <h1 className="max-w-3xl text-3xl jetbrains-mono leading-10 md:leading-[60px] text-slate-800 md:text-5xl">
                 Accept <span className="text-emerald-400">Crypto</span> Payments Like Stripe
               </h1>
               <p className="max-w-xl leading-8 text-slate-800">
@@ -39,10 +40,10 @@ const Home = () => {
 
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link
-                to="/checkout"
+                to="/overview"
                 className="inline-flex items-center justify-center bg-[#064e3b] px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-[#0a6c52] hover:text-white"
               >
-                Start Integration
+                Get Started
               </Link>
               <Link
                 to="#developers"
@@ -64,23 +65,20 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="relative flex p-2 md:h-[470px] md:w-[470px] border-2 border-slate-800 shadow-2xl shadow-slate-950/30">
-            <img src={HeroImg} alt="Hero" className='w-[] md:w-[520px]' />
+          <div className="relative flex p-2 sm:h-[470px] sm:w-[470px] border-2 border-slate-800 shadow-2xl shadow-slate-950/30">
+            <img src={HeroImg} alt="Hero" className='w-full md:w-[520px]' />
 
-            <div className="absolute left-0 md:-left-10 -bottom-10
-            w-full md:w-72 bg-slate-950/95 jetbrains-mono p-6 hover:scale-105">
-              <div className="flex gap-3 text-sm text-[#10b981]">
-                <SquareTerminal />
-                <span className=''>NEKSU API SHELL</span>
-              </div>
-              <div className="bg-slate-900/90 py-4 text-sm text-slate-200">
-                <p className='text-wrap w-full text-slate-400 jetbrains-mono'>
-                  curl -X POST https://api.nexuspay.com/v1/charges \
-                  -H "Authorization: Bearer sk_live_..." \
-                  -d amount=5000 \
-                  -d currency=usdc
-                </p>
-              </div>
+            <div className="absolute left-0 md:-left-10 -bottom-20 md:-bottom-10
+            w-full md:w-72 hover:scale-105">
+<CodeCard
+  fileName="cURL EXAMPLE"
+  size='100%'
+  code={`curl -X POST https://api.norelix.com/v1/charges
+
+  -H "Authorization: Bearer sk_live_..."
+  -d amount=5000
+  -d currency=usdc`}
+/>
             </div>
           </div>
         </div>
@@ -88,7 +86,7 @@ const Home = () => {
 
 
       <section id="features" className="mx-auto max-w-7xl space-y-8 px-6 py-20 sm:px-8 bg-slate-100">
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <article className="border border-slate-800 p-8 brutal">
             <ShoppingCart size={'30px'} className='text-black bg-[#10b981] p-3 box-content' />
             <p className="text-sm uppercase tracking-[0.32em] text-black mt-4">Embedded Checkout</p>
@@ -109,14 +107,14 @@ const Home = () => {
 
 
       <section className="mx-auto mt-20 max-w-7xl px-6 py-16 md:px-8">
-        <div className="border flex flex-row border-slate-500/70 text-black p-8 grid gap-10 gap-13 md:grid-cols-2">
+        <div className="border flex flex-row justify-center border-slate-500/70 text-black p-8 grid gap-10 gap-13 sm:grid-cols-2">
           <div className="flex flex-col gap-5 w-full">
             <div className="inline-flex items-center gap-2 bg-emerald-500/30 px-4 py-2 text-[14px] text-black jetbrains-mono w-[200px]">
               <span className="inline-flex h-2.5 w-2.5  bg-emerald-400" />
               FOR DEVELOPERS
             </div>
             <h1 className="text-black leading-10">API-first Payments</h1>
-            <p className="text-slate-700">A robust, typed SDK that works exactly like the tools you already use. From webhooks to customized metadata, NexusPay handles the complexity of the chain while you build the product.</p>
+            <p className="text-slate-700">A robust, typed SDK that works exactly like the tools you already use. From webhooks to customized metadata, Norelix handles the complexity of the chain while you build the product.</p>
             <div className="flex flex-col gap-3 text-[14px]">
               <span className="flex gap-2">
                 <Webhook color='#10b981' />
@@ -130,19 +128,22 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="w-full md:p-6">
-            <CodeWindow code={`
-  const nexus = new NexusPay('sk_test_...');
-    await nexus.payments.create({ 
-      amount: 25000,
-      currency: 'USDC',
-      metadata: {
-        order_id: '#7122'
-      },
-      success_url: 'https://app.nexus.pay/success'
-    });
-    `
-            } />
+          <div className="w-full">
+<CodeWindow
+fileName='JavaScript'
+size='100%'
+code={`
+//Iframe widget snippet
+<iframe
+src="https://nexksupay.com/api/v1/<payload>"
+allow="clipboard-write"
+title="Norelix Checkout"
+loading="lazy"
+style="width:100%;
+height:100%; border:none;">
+</iframe>
+  `
+} />
           </div>
         </div>
       </section>
@@ -156,21 +157,21 @@ const Home = () => {
           <h2 className='text-black text-md'>Engineered for Technical Trust</h2>
           <p className='text-black text-[14px]'>The most secure payment infrastructure on Ethereum, Polygon, and Solana. Verified by top security firms.</p>
         </div>
-        <div className="mx-auto grid gap-10 px-6 md:grid-cols-[0.9fr_1.1fr] md:px-8">
-          <div className="bg-[#2c3134] w-[100%] text-start p-10 brutal">
+        <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:px-8">
+          <div className="min-w-0 bg-[#2c3134] w-full text-start p-10 brutal">
             <div className="inline-flex items-center gap-2 bg-emerald-500/30 px-4 py-2 text-[14px] text-white jetbrains-mono">
               <span className="inline-flex h-2.5 w-2.5  bg-emerald-400" />
-              V2.0 Now Live
+              V1.0 Now Live
             </div>
-            <h1 className='text-2xl'>Real-time Transaction Stream</h1>
-            <div className="grid text-slate-300 jetbrains-mono">
+            <h1 className='text-[20px] mt-3'>Real-time Transaction Stream</h1>
+            <div className="grid text-slate-300 jetbrains-mono mt-5">
               <div className="">
                 {[
                   { TX_ID: '0x231313131...031', label: 'Swap', amount: '422 USDC' },
                   { TX_ID: '0x231313131...031', label: 'Payment', amount: '1,260 USDC' },
                   { TX_ID: '0x231313131...031', label: 'Refund', amount: '60 USDC' },
                 ].map((event) => (
-                  <div key={event.TX_ID} className="flex items-center justify-between gap-2 py-2 text-[14pxpx] text-slate-300 jetbrains-mono border-b border-slate-600">
+                  <div key={event.TX_ID} className="flex items-center justify-between gap-2 py-2 text-[12px] sm:text-[14px] text-slate-300 jetbrains-mono border-b border-slate-600">
                     <div className="">
                       <p className="font-medium text-slate-400">TX_ID: {event.TX_ID}</p>
                       <p className="text-xs text-slate-500">{event.label}</p>
@@ -182,11 +183,11 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <div className="border flex flex-col gap-5 border-slate-500/70 bg-gray-200 text-black p-8">
               <p className="text-sm uppercase tracking-[0.32em]">Global Gas-Less Rails</p>
-              <p className="max-w-xl text-sm leading-7">NexusPay abstracts gas fees for your users, allowing for a seamless USDC experience without needing native chain tokens.</p>
-              <div className='flex gap-5'>
+              <p className="max-w-xl text-sm leading-7">Norelix abstracts gas fees for your users, allowing for a seamless USDC experience without needing native chain tokens.</p>
+              <div className='flex flex-wrap gap-5'>
                 <div className="inline-flex items-center gap-2 bg-emerald-500/30 px-4 py-2 text-[12px] text-[#064e3b] jetbrains-mono">
                   <span className="inline-flex h-2.5 w-2.5  bg-emerald-400" />
                   L2 OPTIMISED
@@ -202,7 +203,7 @@ const Home = () => {
               <div className="border border-slate-500/70 p-6 text-black gap-3 flex flex-col justify-center items-center">
                 <ShieldCheck color='#064e3b' size={40} />
                 <p className="text-[14px] uppercase tracking-[0.32em] font-bold">Certified Security</p>
-                <p className="text-[14px] text-center">Audited smart contracts and merchant-level webhooks with HMAC verification.</p>
+                <p className="text-[14px] text-center">Audited smart contracts and merchant-level webhooks with real-time events.</p>
               </div>
               <div className="border border-slate-500/70 p-6 text-black gap-3 flex flex-col justify-center items-center">
                 <KeyRound color='#064e3b' size={40} />
