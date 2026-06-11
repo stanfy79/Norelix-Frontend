@@ -9,7 +9,7 @@ function Footer() {
                     <Link to="/">
                         <p className="text-black text-4xl font-bold">Norelix</p>
                     </Link>
-                    <p className='text-[12px] text-slate-700 max-w-[400px] mt-3'>© 2024 Norelix. Secure On-Chain Payments for the next generation of global commerce. Built for builders.</p>
+                    <p className='text-[12px] text-slate-700 max-w-[400px] mt-3'>© 2026 Norelix. Secure On-Chain Payments for the next generation of global commerce. Built for builders.</p>
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm text-slate-400">
                     <Link to="#" className="transition hover:text-black">Privacy</Link>
