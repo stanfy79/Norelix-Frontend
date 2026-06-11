@@ -58,7 +58,7 @@ const Home = () => {
 
             <div className="grid sm:grid-cols-2 lg:max-w-2xl text-black">
               <div className="p-4">
-                <p className="mt-3 text-3xl font-semibold">$2.4B+</p>
+                <p className="mt-3 text-3xl font-semibold">$--</p>
                 <p className="text-sm uppercase tracking-[0.32em] text-slate-700 mt-3">
                   Volume Processed
                 </p>
