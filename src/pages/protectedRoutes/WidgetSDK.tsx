@@ -22,6 +22,8 @@ const WidgetSDK: React.FC = () => {
   }
   const isBusinessLoading = Boolean(apiLoading?.business);
 
+  const apiEndpoint = "https://norelix-sdk.vercel.app/?payload=${encodeURIComponent(JSON.stringify(payload))}";
+
   return (
     <div className='flex flex-col overflow-hidden'>
       <Header />
@@ -101,7 +103,7 @@ const WidgetSDK: React.FC = () => {
                 <div className="">
                   <span className="text-[12px] text-slate-600 font-bold">WIDGET ENDPOINT URL</span>
                   <div className="flex gap-3 justify-between">
-                    <div className="w-full bg-slate-100 border-2 border-slate-200/50 text-[12px] text-black p-2 jetbrains-mono overflow-x-auto">https://api.merchant.com/v1/webhooks/nexus</div>
+                    <div className="w-full bg-slate-100 border-2 border-slate-200/50 text-[12px] text-black p-2 jetbrains-mono overflow-x-auto custom-scrollbar"><pre>{apiEndpoint}</pre></div>
                     <button className="brutal bg-[#10b981] text-white text-[12px] font-bold p-2 w-16 jetbrains-mono">
                       Copy
                     </button>
@@ -115,22 +117,21 @@ const WidgetSDK: React.FC = () => {
                   <div className="bg-slate-100 border-2 border-slate-200/50 w-full">
                     <CodeCard fileName='Widget SDK'
                       size='100%'
-                      code={`//Store your keys in an object
+                      code='//Store your keys in an object
 Const payload = {
-apikey: <YOUR API KEY>
-secretkey: <YOUR SECRET KEY>
-amount: <AMOUNT TO PAY>
-orderId: <YOUR ORDER ID>
+  apikey: <YOUR API KEY>
+  secretkey: <YOUR SECRET KEY>
+  amount: <AMOUNT TO PAY>
+  orderId: <YOUR ORDER ID>
 }
 
-//Iframe widget snippet
-<iframe
-src="https://nexksupay.com/api/v1/<payload>"
-allow="clipboard-write" title="Norelix Checkout"
-loading="lazy"style="width:100%;
-height:100%; border:none;
-"></iframe>
-`} />
+//Payment page API URL
+<a href="https://norelix-sdk.vercel.app/?payload=${encodeURIComponent(JSON.stringify(payload))}"}>
+  <button className="bg-pink-600 p-3 w-full text-white">
+  Proceed To Payment
+  </button>
+</a>
+' />
                   </div>
                 </div>
               </div>
