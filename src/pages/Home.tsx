@@ -15,11 +15,13 @@ import Footer from "../components/common/Footer";
 import ScrollAnimation from "../components/ui/ScrollAnimation";
 import CodeWindow from "../components/ui/CodeCard";
 import CodeCard from "../components/ui/CodeCard";
+import ScrollToHash from "../components/ui/HashScroll";
 
 const Home = () => {
   return (
     <main className="text-slate-100 bg-[#f1f5f9]">
       <Header />
+      <ScrollToHash />
 
       <section className="relative overflow-hidden py-16">
         <div className="mx-auto mt-10 grid gap-20 px-4 lg:grid-cols-[1.1fr_0.9fr] sm:px-8 border">
@@ -94,8 +96,8 @@ const Home = () => {
       </section>
 
       <section
-        id="#features"
-        className="mx-auto max-w-7xl space-y-8 px-6 py-20 sm:px-8 bg-slate-100"
+        id="features"
+        className="mx-auto max-w-7xl scroll-mt-24 space-y-8 px-6 py-10 sm:px-8 bg-slate-100"
       >
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"> 
           <article className="border border-slate-800 p-8 brutal">
@@ -140,7 +142,10 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="mx-auto mt-20 max-w-7xl px-6 py-16 md:px-8">
+      <section
+        id="developers"
+        className="mx-auto mt-20 max-w-7xl scroll-mt-24 px-6 md:px-8"
+      >
         <div className="border flex flex-row justify-center border-slate-500/70 text-black p-8 grid gap-10 gap-13 sm:grid-cols-2">
           <div className="flex flex-col gap-5 w-full">
             <div className="inline-flex items-center gap-2 bg-emerald-500/30 px-4 py-2 text-[14px] text-black jetbrains-mono w-[200px]">
@@ -189,9 +194,11 @@ height:100%; border:none;">
         </div>
       </section>
 
-      <ScrollAnimation />
+      <div className="scroll-mt-24">
+        <ScrollAnimation />
+      </div>
 
-      <section className="py-20 text-center">
+      <section id="solutions" className="py-20 text-center">
         <div className="py-8 px-4">
           <h2 className="text-black text-md">Engineered for Technical Trust</h2>
           <p className="text-black text-[14px]">
