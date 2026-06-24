@@ -6,7 +6,6 @@ import { usePrivy } from '@privy-io/react-auth';
 import { router } from './routes';
 import ProviderContext from './context/ProviderContext';
 import { FullScreenLoader } from './components/ui/fullscreen-loader';
-import ScrollToHash from './components/ui/HashScroll'
 
 const queryClient = new QueryClient();
 
@@ -21,7 +20,6 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <ProviderContext>
-          {/* <ScrollToHash /> */}
           <RouterProvider router={router} />
         </ProviderContext>
       </QueryClientProvider>
