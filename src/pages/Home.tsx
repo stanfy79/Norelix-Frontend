@@ -303,7 +303,7 @@ height:100%; border:none;">
             Ready to upgrade your payment stack?
           </p>
           <h2 className="mt-4 text-2xl font-semibold md:text-4xl">
-            Join 5,000+ developers building the future of crypto payments.
+            Join developers building the future of crypto payments.
           </h2>
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-4 sm:flex-row sm:justify-center">
             <Link to="/signin">
