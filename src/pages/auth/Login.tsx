@@ -1,14 +1,19 @@
 import { Navigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import Header from '../../components/common/Header';
 import { usePrivy } from '@privy-io/react-auth';
 import { FullScreenLoader } from '../../components/ui/fullscreen-loader';
+import { DataContext } from "../../context/Context";
 
 const Login: React.FC = () => {
 
-    const { ready, authenticated, login } = usePrivy();
+    const { ready, authenticated, user, login } = usePrivy();
+    const { signup } = useContext(DataContext) as {
+        signup: (userData: any) => void;
+    };
 
     if (ready && authenticated) {
+        signup(user);
         return <Navigate to="/overview" replace />
     };
 

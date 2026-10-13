@@ -82,6 +82,21 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
   const [txHistoryLoading, setTxHistoryLoading] = useState<boolean>(false);
   const [analyticsLoading, setAnalyticsLoading] = useState<boolean>(false);
 
+  const signup = async (userData: any) => {
+    if (!ready || !user?.id) return;
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/api/merchant/auth/login`, userData,
+      );
+
+      return response;
+    } catch (err) {
+      console.error("Error signing up:", err);
+      throw err;
+    }
+  };
+
   const createBusiness = async (payload: CreateBusiness) => {
     if (!ready || !user?.id) return;
 
@@ -365,6 +380,7 @@ function ProviderContext({ children }: { children: React.ReactNode }) {
           txHistory: txHistoryLoading,
           analytics: analyticsLoading,
         },
+        signup,
         getBusinessPayments,
         getBusinessAnalytics,
         updateBusinessSettings,
